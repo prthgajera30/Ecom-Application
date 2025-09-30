@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #6b7280; /* gray-500 */
+  --card: #ffffff;
+  --brand: #111111; /* primary black */
+  --accent: #1f2937; /* gray-800 */
+}
+
+body { @apply bg-[var(--bg)] text-[var(--fg)]; }
+
+.card { @apply bg-[var(--card)] border border-gray-200 rounded-lg shadow-sm; }
+.btn-primary { @apply inline-flex items-center justify-center rounded bg-black text-white px-4 py-2 hover:bg-gray-900 transition; }
+.btn-accent { @apply inline-flex items-center justify-center rounded bg-[var(--accent)] text-white px-4 py-2 hover:bg-gray-900 transition; }
+.link { color: var(--fg); opacity: .8; text-decoration: underline; }
