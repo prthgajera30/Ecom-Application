@@ -21,3 +21,11 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
     return res.status(401).json({ error: 'UNAUTHORIZED' });
   }
 }
+
+export function requireRole(role: AuthPayload['role']) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const user = (req as any).user as AuthPayload | undefined;
+    if (!user || user.role !== role) return res.status(403).json({ error: 'FORBIDDEN' });
+    next();
+  };
+}

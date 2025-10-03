@@ -15,6 +15,7 @@ model User {
   createdAt    DateTime @default(now())
   orders       Order[]
   events       Event[]
+  addresses    Address[]
 }
 
 enum Role {
@@ -26,12 +27,21 @@ model Order {
   id        String      @id @default(uuid())
   user      User        @relation(fields: [userId], references: [id])
   userId    String
+  subtotal  Int
+  tax       Int
+  shipping  Int
+  discount  Int      @default(0)
   total     Int
   currency  String
   status    OrderStatus @default(pending)
   createdAt DateTime    @default(now())
   items     OrderItem[]
   payment   Payment?
+  shippingAddress   Address?        @relation("OrderAddress", fields: [shippingAddressId], references: [id])
+  shippingAddressId String?
+  shippingMethod    ShippingMethod? @relation(fields: [shippingMethodId], references: [id])
+  shippingMethodId  String?
+  promoCode         String?
 }
 
 enum OrderStatus {
@@ -45,6 +55,8 @@ model OrderItem {
   order     Order  @relation(fields: [orderId], references: [id])
   orderId   String
   productId String
+  title     String
+  image     String?
   price     Int
   qty       Int
 }
@@ -57,6 +69,36 @@ model Payment {
   amount                Int
   status                String
   createdAt             DateTime @default(now())
+}
+
+model Address {
+  id         String   @id @default(uuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  fullName   String
+  line1      String
+  line2      String?
+  city       String
+  state      String?
+  postalCode String
+  country    String
+  phone      String?
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  orders     Order[]  @relation("OrderAddress")
+}
+
+model ShippingMethod {
+  id            String   @id @default(uuid())
+  name          String
+  description   String?
+  rate          Int
+  estimatedDays Int?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  orders        Order[]
 }
 
 model Event {
