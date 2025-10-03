@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { apiGet } from '../lib/api';
+import { getDefaultVariant } from '../lib/product-variants';
 import { getSocket } from '../lib/ws';
 
 export default function Page() {
@@ -35,15 +36,36 @@ export default function Page() {
       <h2 className="text-xl font-semibold mb-4">Featured</h2>
       {featured.length === 0 && <p className="text-gray-600">No items yet. Try seeding, then refresh.</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {featured.map((p) => (
-          <Link key={p._id} href={`/product/${p.slug}`} className="card overflow-hidden">
-            {p.images?.[0] && <img src={p.images[0]} alt={p.title} className="w-full h-48 object-cover" />}
-            <div className="p-4">
-              <div className="font-medium mb-1 line-clamp-1">{p.title}</div>
-              <div className="text-sm text-gray-600">${p.price / 100}</div>
-            </div>
-          </Link>
-        ))}
+        {featured.map((p) => {
+          const defaultVariant = getDefaultVariant(p);
+          const rawPrice = defaultVariant?.price ?? p.price;
+          const numericPrice =
+            typeof rawPrice === 'number'
+              ? rawPrice
+              : typeof rawPrice === 'string'
+              ? Number.parseFloat(rawPrice)
+              : null;
+          const priceLabel =
+            typeof numericPrice === 'number' && Number.isFinite(numericPrice)
+              ? `$${(numericPrice / 100).toFixed(2)}`
+              : 'Price unavailable';
+
+          return (
+            <Link key={p._id} href={`/product/${p.slug}`} className="card overflow-hidden">
+              {(defaultVariant?.image ?? defaultVariant?.images?.[0] ?? p.images?.[0]) && (
+                <img
+                  src={(defaultVariant?.image ?? defaultVariant?.images?.[0] ?? p.images?.[0]) as string}
+                  alt={p.title}
+                  className="w-full h-48 object-cover"
+                />
+              )}
+              <div className="p-4">
+                <div className="font-medium mb-1 line-clamp-1">{p.title}</div>
+                <div className="text-sm text-gray-600">{priceLabel}</div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </main>
   );
