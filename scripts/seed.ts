@@ -42,6 +42,30 @@ async function main() {
   await prisma.user.create({ data: { email: 'admin@example.com', passwordHash: adminPass, role: 'admin' } });
   const user = await prisma.user.create({ data: { email: 'user@example.com', passwordHash: userPass, role: 'customer' } });
 
+  await prisma.shippingMethod.deleteMany();
+  await prisma.shippingMethod.createMany({
+    data: [
+      { name: 'Standard', description: 'Delivers in 5-7 business days', rate: 700, estimatedDays: 7 },
+      { name: 'Express', description: 'Priority shipping in 2-3 days', rate: 1500, estimatedDays: 3 },
+      { name: 'Next Day', description: 'Arrives the next business day', rate: 2500, estimatedDays: 1 },
+    ],
+  });
+
+  await prisma.address.deleteMany();
+  await prisma.address.create({
+    data: {
+      userId: user.id,
+      fullName: 'Seed Customer',
+      line1: '123 Market St',
+      city: 'San Francisco',
+      state: 'CA',
+      postalCode: '94105',
+      country: 'USA',
+      phone: '+1 555-000-1234',
+      isDefault: true,
+    },
+  });
+
   await prisma.event.deleteMany();
   await prisma.event.createMany({
     data: [

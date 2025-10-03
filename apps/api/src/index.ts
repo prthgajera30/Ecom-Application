@@ -14,7 +14,8 @@ import cartRoutes from './routes/cart';
 import checkoutRoutes from './routes/checkout';
 import ordersRoutes from './routes/orders';
 import recsRoutes from './routes/recs';
-import { fileURLToPath } from 'url';
+import addressesRoutes from './routes/addresses';
+import shippingRoutes from './routes/shipping';
 
 export const app = express();
 const server = http.createServer(app);
@@ -25,7 +26,7 @@ const io = new SocketIOServer(server, {
 (app as any).set('io', io);
 
 const logger = pino({ level: process.env.NODE_ENV === 'production' ? 'info' : 'debug' });
-app.use(pinoHttp({ logger }));
+app.use(pinoHttp({ logger: logger as any }));
 app.use(helmet());
 app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json({ type: ['application/json','application/*+json'] }));
@@ -43,6 +44,8 @@ app.use('/api', cartRoutes);
 app.use('/api', checkoutRoutes);
 app.use('/api', ordersRoutes);
 app.use('/api', recsRoutes);
+app.use('/api', addressesRoutes);
+app.use('/api', shippingRoutes);
 
 io.on('connection', (socket) => {
   logger.info({ id: socket.id }, 'socket connected');
@@ -63,12 +66,8 @@ export async function start() {
 }
 
 const isMain = (() => {
-  try {
-    const thisFile = fileURLToPath(import.meta.url);
-    return process.argv[1] && thisFile === process.argv[1];
-  } catch {
-    return false;
-  }
+  const entry = process.argv[1] || '';
+  return entry.endsWith('index.ts') || entry.endsWith('index.js');
 })();
 
 if (isMain) {

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { apiGet, apiPost } from '../../../lib/api';
 
 type Cart = { items: { productId: string; qty: number }[] };
@@ -80,7 +81,12 @@ export default function CartPage() {
         <div className="text-lg font-semibold">${(total / 100).toFixed(2)}</div>
       </div>
       <div className="mt-4">
-        <button className="btn-primary w-full">Proceed to Checkout</button>
+        <Link
+          href="/checkout"
+          className={`btn-primary w-full text-center ${cart.items.length === 0 ? 'pointer-events-none opacity-60' : ''}`}
+        >
+          Proceed to Checkout
+        </Link>
       </div>
     </div>
   );

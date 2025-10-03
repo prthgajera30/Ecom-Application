@@ -6,13 +6,20 @@ const router = Router();
 
 router.get('/orders', requireAuth, async (req, res) => {
   const userId = (req as any).user.userId as string;
-  const orders = await prisma.order.findMany({ where: { userId }, include: { items: true, payment: true } });
+  const orders = await prisma.order.findMany({
+    where: { userId },
+    include: { items: true, payment: true, shippingAddress: true, shippingMethod: true },
+    orderBy: { createdAt: 'desc' },
+  });
   res.json(orders);
 });
 
 router.get('/orders/:id', requireAuth, async (req, res) => {
   const userId = (req as any).user.userId as string;
-  const order = await prisma.order.findFirst({ where: { id: req.params.id, userId }, include: { items: true, payment: true } });
+  const order = await prisma.order.findFirst({
+    where: { id: req.params.id, userId },
+    include: { items: true, payment: true, shippingAddress: true, shippingMethod: true },
+  });
   if (!order) return res.status(404).json({ error: 'NOT_FOUND' });
   res.json(order);
 });

@@ -7,11 +7,13 @@
     "dev:api": "pnpm --filter ./apps/api dev",
     "dev:web": "pnpm --filter ./apps/web dev",
     "dev:recs": "python apps/recs/app.py",
-    "dev": "concurrently -n api,web,recs -c green,cyan,yellow \"pnpm dev:api\" \"pnpm dev:web\" \"pnpm dev:recs\"",
+    "dev": "concurrently -n api,web -c green,cyan \"pnpm dev:api\" \"pnpm dev:web\"",
+    "dev:all": "concurrently -n api,web,recs -c green,cyan,yellow \"pnpm dev:api\" \"pnpm dev:web\" \"pnpm dev:recs\"",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "migrate": "tsx scripts/migrate.ts",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "setup:recs": "python -m pip install -r apps/recs/requirements.txt"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
